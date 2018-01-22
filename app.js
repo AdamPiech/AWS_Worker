@@ -9,16 +9,16 @@ var fs = require("fs");
 var path  = require("path");
 var jimp = require("jimp");
 
-AWS.config.loadFromPath('../WebPage/config/aws-config.json');
+AWS.config.loadFromPath('config.json');
 
 var sqs = new AWS.SQS();
 var s3 = new AWS.S3();
 
-var queueUrl = "https://sqs.us-west-2.amazonaws.com/440412059271/awsPsoirQueue";
-var bucketName = "awspsoir";
+var queueUrl = "https://sqs.us-west-2.amazonaws.com/211653061305/PhotoViewerSQS";
+var bucketName = "photoviewerstore";
 var avalaibleConvertions = ["greyScale", "invert", "sepia", "blur"];
 
-work(); // initial iteration
+work();
 
 function work() {
     var receiptHandleMsg;
@@ -37,7 +37,7 @@ function work() {
             function (cb) {
                 return deleteQueueMsg(receiptHandleMsg, cb);
             }
-        ], function (err, result) { //default error
+        ], function (err, result) {
 		    if(err) 
 			{
                 console.log("ERROR: " + err);
@@ -56,7 +56,7 @@ function receiveQueueMsg(cb) {
         QueueUrl: queueUrl,
         MaxNumberOfMessages: 1
     };
-    sqs.receiveMessage(params, function(err, data) { /*Receive Message from queue*/
+    sqs.receiveMessage(params, function(err, data) {
         if (err) {
             console.log(err, err.stack);
             return cb(err);
@@ -69,7 +69,7 @@ function receiveQueueMsg(cb) {
             console.log("Received message");
             var messsageBody = JSON.parse(data.Messages[0].Body);
             var receiptHandle = data.Messages[0].ReceiptHandle;
-			/*Check if received message is correct*/
+
 			if(!messsageBody.hasOwnProperty("key") || !messsageBody.hasOwnProperty("option")) {
 				return cb("Invalid message");
 			}
@@ -112,7 +112,7 @@ function convertImage(msgBody, cb) {
         }
         console.log("File converted");
 
-        image.write(convertedFileName, function () { //Save temp file locally
+        image.write(convertedFileName, function () {
             console.log("File Saved");
             return cb(null, convertedFileName);
         });
@@ -145,7 +145,6 @@ function saveImageInBucket(convertedFileName, cb) {
             }
             else {
                 console.log("Image saved in bucket");
-				/*Image saved in bucket, local file removal started*/
 				remove([convertedFileName], function(err,removed){
 					if(err)
 					{

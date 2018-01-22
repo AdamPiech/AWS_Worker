@@ -1,12 +1,12 @@
 {
-  "name": "aws-project-front",
+  "name": "aws-worker",
   "version": "0.0.1",
   "description": "",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "Jacek Byczkiewicz",
+  "author": "Adam Piech",
   "license": "no license",
   "dependencies": {
     "async": "^0.2.10",
