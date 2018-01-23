@@ -126,7 +126,7 @@ function convertImage(msgBody, cb) {
     });
 }
 
-function saveImageInBucket(convertedFileName, cb) {
+function saveImageInBucket(convertedFileName, msgBody, cb) {
 
     var fileStream = fs.createReadStream(path.join( __dirname, convertedFileName));
 
@@ -191,6 +191,7 @@ function deleteQueueMsg(receiptHandleMsg, cb) {
         QueueUrl: queueUrl,
         ReceiptHandle: receiptHandleMsg
     };
+
     sqs.deleteMessage(params, function(err, data) {
         if (err) {
             console.log(err, err.stack);
