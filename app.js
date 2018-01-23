@@ -31,7 +31,7 @@ function work() {
                 receiptHandleMsg = receiptHandle;
                 return convertImage(msgBody, cb);
             },
-            function (msgBody, convertedFileName, cb) {
+            function (convertedFileName, msgBody, cb) {
                 if (msgBody.option === "remove") {
                     return deleteImageFromBucket(convertedFileName, msgBody, cb);
                 } else {
