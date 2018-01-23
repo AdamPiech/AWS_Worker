@@ -132,7 +132,7 @@ function saveImageInBucket(convertedFileName, cb) {
 
     var params = {
         Bucket: bucketName,
-        Key: "photos/" + convertedFileName,
+        Key: convertedFileName,
         ACL: "public-read",
         Body: fileStream
     };
@@ -165,7 +165,7 @@ function deleteImageFromBucket(convertedFileName, msgBody, cb) {
        
     var params = {
         Bucket: bucketName,
-        Key: "photos/" + msgBody.key
+        Key: msgBody.key
     };
         
     s3.deleteObject(params, function(err, data) {
