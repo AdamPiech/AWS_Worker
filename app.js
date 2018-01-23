@@ -33,9 +33,9 @@ function work() {
             },
             function (msgBody, convertedFileName, cb) {
                 if (msgBody.option === "remove") {
-                    return deleteImageFromBucket(msgBody, cb);
+                    return deleteImageFromBucket(convertedFileName, msgBody, cb);
                 } else {
-                    return saveImageInBucket(convertedFileName, cb);
+                    return saveImageInBucket(convertedFileName, msgBody, cb);
                 }
             },
             function (cb) {
