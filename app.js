@@ -29,13 +29,15 @@ function work() {
             },
             function (msgBody, receiptHandle, cb) {
                 receiptHandleMsg = receiptHandle;
-                return convertImage(msgBody, cb);
+                if (msgBody.option !== "remove") {
+                    return convertImage(msgBody, cb);
+                }
             },
             function (msgBody, convertedFileName, cb) {
-                if (msgBody.option.localeCompare("remove") != 0) {
-                    return saveImageInBucket(convertedFileName, cb);
-                } else {
+                if (msgBody.option === "remove") {
                     return deleteImageFromBucket(msgBody, cb);
+                } else {
+                    return saveImageInBucket(convertedFileName, cb);
                 }
             },
             function (cb) {
@@ -147,8 +149,7 @@ function saveImageInBucket(convertedFileName, cb) {
             if (err) {
                 console.log(err, err.stack);
                 return cb(err);
-            }
-            else {
+            } else {
                 console.log("Image saved in bucket");
 				remove([convertedFileName], function(err, removed) {
 					if(err) {
