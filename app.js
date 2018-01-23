@@ -29,17 +29,12 @@ function work() {
             },
             function (msgBody, receiptHandle, cb) {
                 receiptHandleMsg = receiptHandle;
-                if (msgBody.option !== "remove") {
-                    console.log("############################################################################################################");
-                    return convertImage(msgBody, cb);
-                }
+                return convertImage(msgBody, cb);
             },
             function (msgBody, convertedFileName, cb) {
                 if (msgBody.option === "remove") {
-                    console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
                     return deleteImageFromBucket(msgBody, cb);
                 } else {
-                    console.log("############################################################################################################");
                     return saveImageInBucket(convertedFileName, cb);
                 }
             },
@@ -125,7 +120,7 @@ function convertImage(msgBody, cb) {
 
         image.write(convertedFileName, function () {
             console.log("File Saved");
-            return cb(null, convertedFileName);
+            return cb(null, convertedFileName, msgBody);
         });
 
     });
@@ -166,19 +161,26 @@ function saveImageInBucket(convertedFileName, cb) {
     });
 }
 
-function deleteImageFromBucket(msgBody, cb) {
+function deleteImageFromBucket(convertedFileName, msgBody, cb) {
        
     var params = {
         Bucket: bucketName,
-        Key: "photos/" + msgBody.key,
-        ACL: "public-read",
-        Body: fileStream
+        Key: "photos/" + msgBody.key
     };
         
     s3.deleteObject(params, function (err, data) {
         if (err){
             console.log(err, err.stack);
             return cb(err);
+        } else {
+            console.log("Image removed from bucket");
+            remove([convertedFileName], function(err, removed) {
+					if(err) {
+						console.log("Failed to remove local file");
+						return cb(err);
+					}
+					return cb();
+				});
         }
     });
 }
