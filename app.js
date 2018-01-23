@@ -16,7 +16,7 @@ var s3 = new AWS.S3();
 
 var queueUrl = "https://sqs.us-west-2.amazonaws.com/211653061305/PhotoViewerSQS";
 var bucketName = "photoviewerstore";
-var avalaibleConvertions = ["greyScale", "invert", "sepia", "blur"];
+var avalaibleConvertions = ["greyScale", "invert", "sepia", "blur", "remove"];
 
 work();
 
@@ -38,12 +38,10 @@ function work() {
                 return deleteQueueMsg(receiptHandleMsg, cb);
             }
         ], function (err, result) {
-		    if(err) 
-			{
+		    if(err) {
                 console.log("ERROR: " + err);
             } 
-			else
-			{
+			else {
                 console.log("Coversion successfully done");
             }
             return work();
@@ -77,6 +75,7 @@ function receiveQueueMsg(cb) {
 			if(!_.includes(avalaibleConvertions, messsageBody.option)) {
 				return cb("Wrong option");
 			}
+
             return cb(null, messsageBody, receiptHandle);
         }
     });
@@ -84,6 +83,7 @@ function receiveQueueMsg(cb) {
 
 
 function convertImage(msgBody, cb) {
+    
     var imageLink = encodeURI("https://s3-us-west-2.amazonaws.com/" + bucketName + "/" + msgBody.key);
 
     jimp.read(imageLink, function (err, image) {
@@ -107,6 +107,8 @@ function convertImage(msgBody, cb) {
 			case "blur":
 				image.blur(50);
 				break;
+            case "remove":
+				break;
             default:
                 console.log("Case " + msgBody.operation + " doesn't exist");
         }
@@ -126,14 +128,13 @@ function saveImageInBucket(convertedFileName, cb) {
 
     var params = {
         Bucket: bucketName,
-        Key: "convertedImages/" + convertedFileName,
+        Key: "uploadedImages/" + convertedFileName,
         ACL: "public-read",
         Body: fileStream
     };
 
     fileStream.on('error', function (err) {
-        if (err) 
-		{
+        if (err) {
 			return cb(err); 
 		}
     });
@@ -145,9 +146,8 @@ function saveImageInBucket(convertedFileName, cb) {
             }
             else {
                 console.log("Image saved in bucket");
-				remove([convertedFileName], function(err,removed){
-					if(err)
-					{
+				remove([convertedFileName], function(err,removed) {
+					if(err) {
 						console.log("Failed to remove local file");
 						return cb(err);
 					}
@@ -175,8 +175,3 @@ function deleteQueueMsg(receiptHandleMsg, cb) {
         }
     });
 }
-
-
-
-
-
