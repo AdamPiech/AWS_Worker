@@ -168,8 +168,8 @@ function deleteImageFromBucket(convertedFileName, msgBody, cb) {
         Key: "photos/" + msgBody.key
     };
         
-    s3.deleteObject(params, function (err, data) {
-        if (err){
+    s3.deleteObject(params, function(err, data) {
+        if (err) {
             console.log(err, err.stack);
             return cb(err);
         } else {
