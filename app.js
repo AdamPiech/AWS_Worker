@@ -30,13 +30,16 @@ function work() {
             function (msgBody, receiptHandle, cb) {
                 receiptHandleMsg = receiptHandle;
                 if (msgBody.option !== "remove") {
+                    console.log("############################################################################################################");
                     return convertImage(msgBody, cb);
                 }
             },
             function (msgBody, convertedFileName, cb) {
                 if (msgBody.option === "remove") {
+                    console.log("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||");
                     return deleteImageFromBucket(msgBody, cb);
                 } else {
+                    console.log("############################################################################################################");
                     return saveImageInBucket(convertedFileName, cb);
                 }
             },
