@@ -128,7 +128,7 @@ function saveImageInBucket(convertedFileName, cb) {
 
     var params = {
         Bucket: bucketName,
-        Key: "uploadedImages/" + convertedFileName,
+        Key: "photos/" + convertedFileName,
         ACL: "public-read",
         Body: fileStream
     };
