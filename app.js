@@ -126,7 +126,7 @@ function convertImage(msgBody, cb) {
     });
 }
 
-function saveImageInBucket(convertedFileName, msgBody, cb) {
+function saveImageInBucket(convertedFileName, cb) {
 
     var fileStream = fs.createReadStream(path.join( __dirname, convertedFileName));
 
