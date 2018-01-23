@@ -31,8 +31,12 @@ function work() {
                 receiptHandleMsg = receiptHandle;
                 return convertImage(msgBody, cb);
             },
-            function (convertedFileName, cb) {
-                return saveImageInBucket(convertedFileName, cb);
+            function (msgBody, convertedFileName, cb) {
+                if (msgBody.option.localeCompare("remove") != 0) {
+                    return saveImageInBucket(convertedFileName, cb);
+                } else {
+                    return deleteImageFromBucket(msgBody, cb);
+                }
             },
             function (cb) {
                 return deleteQueueMsg(receiptHandleMsg, cb);
@@ -105,7 +109,7 @@ function convertImage(msgBody, cb) {
 				image.sepia();
 				break;
 			case "blur":
-				image.blur(50);
+				image.blur(25);
 				break;
             case "remove":
 				break;
@@ -146,7 +150,7 @@ function saveImageInBucket(convertedFileName, cb) {
             }
             else {
                 console.log("Image saved in bucket");
-				remove([convertedFileName], function(err,removed) {
+				remove([convertedFileName], function(err, removed) {
 					if(err) {
 						console.log("Failed to remove local file");
 						return cb(err);
@@ -155,6 +159,23 @@ function saveImageInBucket(convertedFileName, cb) {
 				});
             }
         });
+    });
+}
+
+function deleteImageFromBucket(msgBody, cb) {
+       
+    var params = {
+        Bucket: bucketName,
+        Key: "photos/" + msgBody.key,
+        ACL: "public-read",
+        Body: fileStream
+    };
+        
+    s3.deleteObject(params, function (err, data) {
+        if (err){
+            console.log(err, err.stack);
+            return cb(err);
+        }
     });
 }
 
